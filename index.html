@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TINY KIDS</title>
+<style>
+:root {
+  --primary-color: #ff6f3c;
+  --secondary-color: #fff;
+  --bg-color: #f5f5f5;
+  --text-color: #333;
+  --card-shadow: rgba(0,0,0,0.1);
+  --hover-shadow: rgba(0,0,0,0.2);
+  --header-bg: rgba(255,255,255,0.9);
+  --info-bg: rgba(255,243,224,0.95);
+}
+
+
+/* --- أساسي --- */
+* { box-sizing: border-box; margin:0; padding:0; }
+body {
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background-color: var(--bg-color);
+  background-image: url('https://instagram.falg7-1.fna.fbcdn.net/v/t1.15752-9/575870905_1606199680745354_8268424199391720712_n.jpg?_nc_cat=105&ccb=1-7&_nc_sid=0024fc&_nc_ohc=W_xQzu0cElYQ7kNvwGcMV2s&_nc_oc=Adl9O2-1jq2RpqDMTIdrpuffws5KUOTsOLV7RK2mc7pyq8MhiwiIlrAkwjWeSMZ_7bo&_nc_zt=23&_nc_ht=instagram.falg7-1.fna&oh=03_Q7cD3wHs7iX74LnC4376fdFfSvg5PNkpCWfUTUaF9KFnEh2cJA&oe=69345CA9');
+  background-size: cover;
+  background-position: center;
+  min-height: 100vh;
+}
+
+
+/* --- رأس الصفحة --- */
+header {
+  background-color: var(--header-bg);
+  padding: 15px 20px;
+  box-shadow: 0 2px 8px var(--card-shadow);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+}
+header h1 {
+  color: var(--primary-color);
+  font-size: 26px;
+  font-weight: bold;
+}
+nav {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}
+nav a img {
+  width: 50px;
+  transition: transform 0.3s;
+}
+nav a img:hover {
+  transform: scale(1.1);
+}
+
+
+/* --- قسم الحساب --- */
+#accountSection { text-align: center; }
+#accountSection p { color: var(--text-color); font-weight: bold; margin-bottom: 5px; }
+#accountSection button {
+  background-color: var(--primary-color);
+  color: var(--secondary-color);
+  border: none;
+  border-radius: 8px;
+  padding: 8px 15px;
+  cursor: pointer;
+  font-weight: bold;
+}
+#accountSection button:hover { background-color: #e05c2b; }
+
+
+/* --- المنتجات --- */
+.products {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 15px;
+  padding: 30px 10px;
+}
+.product {
+  background-color: var(--secondary-color);
+  border-radius: 15px;
+  box-shadow: 0 4px 12px var(--card-shadow);
+  width: 150px;
+  text-align: center;
+  padding: 10px;
+  transition: transform 0.3s, box-shadow 0.3s;
+}
+.product:hover {
+  transform: scale(1.05);
+  box-shadow: 0 8px 20px var(--hover-shadow);
+}
+.product img {
+  width: 100%;
+  border-radius: 12px;
+  margin-bottom: 8px;
+  cursor: pointer;
+}
+.product h3 { font-size: 14px; color: var(--text-color); margin-bottom: 3px; }
+.product p { font-size: 14px; font-weight: bold; color: var(--primary-color); margin-bottom: 8px; }
+.product button {
+  background-color: var(--primary-color);
+  color: var(--secondary-color);
+  border: none;
+  padding: 6px 12px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: bold;
+  font-size: 13px;
+}
+.product button:hover {
+  background-color: #e05c2b;
+  transform: translateY(-2px);
+}
+
+
+/* --- معلومات أسفل الصفحة --- */
+.footer-info {
+  background-color: var(--info-bg);
+  padding: 20px 15px;
+  text-align: center;
+  font-size: 14px;
+  color: var(--text-color);
+  margin-top: 30px;
+  border-radius: 12px 12px 0 0;
+}
+.footer-info p { margin-bottom: 8px; }
+
+
+/* --- Responsive --- */
+@media(max-width:768px){
+  .products { flex-wrap: wrap; justify-content: center; }
+  header { flex-direction: column; gap: 10px; }
+  nav { gap: 10px; }
+  .product { width: 45%; }
+}
+</style>
+</head>
+<body>
+<header>
+  <h1>TINY KIDS</h1>
+  <nav>
+    <a href="cart.html"><img src="pngegg.png" alt="السلة"></a>
+    <a href="contacy.html"><img src="phonee.png" alt="الاتصال"></a>
+    <a href="register.html"><img src="logiin.png" alt="تسجيل" class="small-logo"></a>
+  </nav>
+  <div id="accountSection"></div>
+</header>
+
+
+<section class="products" id="productsSection">
+  <!-- المنتجات سيتم توليدها تلقائيًا -->
+</section>
+
+
+<div class="footer-info">
+  <p>📞 الاتصال: 0557598610 </p>
+  <p> العنوان: الجزائر العاصمة رغاية </p>
+  <p>⏰ مواعيد العمل: 08:00 - 22:00</p>
+  <p>© 2025 TINY KIDS جميع الحقوق محفوظة</p>
+</div>
+
+
+<script>
+// --- التحقق من تسجيل الدخول ---
+const currentUser = JSON.parse(localStorage.getItem("currentUser"));
+const accountSection = document.getElementById("accountSection");
+if(currentUser){
+  accountSection.innerHTML = `<p>👋 أهلاً ${currentUser.name}</p>
+  <button onclick="logout()">تسجيل الخروج</button>`;
+}else{
+  accountSection.innerHTML = `<a href="login.html" style="color: var(--primary-color); font-weight:bold; text-decoration:none;">تسجيل الدخول</a>`;
+}
+function logout(){
+  localStorage.removeItem("currentUser");
+  alert("تم تسجيل الخروج بنجاح");
+  window.location.reload();
+}
+
+
+// --- قائمة المنتجات ---
+const products = [
+  {name:" لبس بناتي", img:"one.jpg", price:2200, description:"فستان بناتي جميل وعصري"},
+  {name:"لبس بناتي 2", img:"two.jpg", price:2200, description:"فستان بناتي 2 جميل"},
+  {name:"لبس بناتي 3", img:"tr.jpg", price:2100, description:"ملابس ولادي أنيقة"},
+  {name:'لبس بناتي 4', img:"f.jpg", price:2100, description:"فستان بناتي جميل وعصري"},
+    {name:'لبس بناتي 5', img:"v.jpg", price:2200, description:"فستان بناتي جميل وعصري"},
+  {name:'لبس بناتي 6', img:"s.jpg", price:2000, description:"فستان بناتي جميل وعصري"},
+    {name:'لبس بناتي 7', img:"d.jpg", price:2000, description:"فستان بناتي جميل وعصري"},
+  {name:'لبس بناتي 8', img:"g.jpg", price:2000, description:"فستان بناتي جميل وعصري"},
+];
+
+
+const productsSection = document.getElementById("productsSection");
+
+
+products.forEach(product=>{
+  const div = document.createElement("div");
+  div.className = "product";
+  div.innerHTML = `
+    <img src="${product.img}" alt="${product.name}" onclick="viewProduct('${product.name}','${product.img}',${product.price},'${product.description}')">
+    <h3>${product.name}</h3>
+    <p>${product.price} DA</p>
+    <button onclick="viewProduct('${product.name}','${product.img}',${product.price},'${product.description}')">شراء الآن</button>
+  `;
+  productsSection.appendChild(div);
+});
+
+
+// --- الانتقال إلى صفحة المنتج ---
+function viewProduct(name,img,price,description){
+  const selectedProduct = {name,img,price,description};
+  localStorage.setItem('selectedProduct', JSON.stringify(selectedProduct));
+  window.location.href = 'product.html';
+}
+</script>
+</body>
+</html>

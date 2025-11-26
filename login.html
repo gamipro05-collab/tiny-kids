@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1.0" />
+<title>تسجيل الدخول — Tiny Kids</title>
+<style>
+  body{font-family:'Cairo',sans-serif;direction:rtl;margin:0;min-height:100vh;
+    display:flex;align-items:center;justify-content:center;
+    background:linear-gradient(135deg,#ff9966,#ff5e62);background-size:200% 200%;animation:move 8s ease-in-out infinite}
+  @keyframes move{0%{background-position:0% 50%}100%{background-position:100% 50%}}
+  .card{width:92%;max-width:480px;padding:28px;border-radius:16px;
+    background:rgba(255,255,255,0.18);backdrop-filter:blur(10px);
+    border:1px solid rgba(255,255,255,0.35);box-shadow:0 12px 40px rgba(0,0,0,0.22);color:#fff}
+  h1{margin:0 0 14px;font-size:24px;text-align:center}
+  .form{display:block}
+  label{display:block;text-align:right;font-weight:700;margin:8px 0 6px}
+  input{width:100%;padding:12px;border-radius:10px;border:none;font-size:15px;margin-bottom:6px;background:rgba(255,255,255,0.9);outline:none}
+  button{width:100%;padding:12px;border-radius:12px;border:none;margin-top:10px;background:#111;color:#fff;font-weight:700;cursor:pointer}
+  button:hover{transform:scale(1.02)}
+  .link{margin-top:12px;text-align:center}
+  a{color:#fff;text-decoration:underline}
+  /* ملف الملف الشخصي */
+  .profile { display:none; text-align:right; }
+  .profile .row{display:flex;gap:10px}
+  .small{font-size:13px;color:rgba(255,255,255,0.95);text-align:center;margin-top:10px}
+  .actions{display:flex;gap:10px;margin-top:12px}
+  .btn-logout{background:#ff4444;color:#fff;padding:10px;border-radius:10px;border:none;flex:1}
+  .btn-save{background:#0a0a0a;color:#fff;padding:10px;border-radius:10px;border:none;flex:1}
+</style>
+</head>
+<body>
+
+
+  <div class="card" id="loginCard" role="main" aria-live="polite">
+    <!-- واجهة تسجيل الدخول -->
+    <div id="loginView">
+      <h1>تسجيل الدخول</h1>
+      <div class="form">
+        <label for="inEmail">البريد الإلكتروني</label>
+        <input id="inEmail" type="email" placeholder="example@mail.com">
+        <label for="inPass">كلمة المرور</label>
+        <input id="inPass" type="password" placeholder="كلمة المرور">
+        <button onclick="login()">دخول</button>
+        <div class="link"><p class="small">ليس لديك حساب؟ <a href="register.html">إنشاء حساب جديد</a></p></div>
+      </div>
+    </div>
+
+
+    <!-- واجهة ملف المستخدم -->
+    <div id="profileView" class="profile" aria-hidden="true">
+      <h1>معلومات حسابك</h1>
+
+
+      <label>الاسم</label>
+      <input id="pName" type="text">
+
+
+      <label>اللقب</label>
+      <input id="pLast" type="text">
+
+
+      <label>البريد الإلكتروني</label>
+      <input id="pEmail" type="email">
+
+
+      <label>كلمة المرور</label>
+      <input id="pPass" type="password">
+
+
+      <div class="actions">
+        <button class="btn-save" onclick="saveProfile()">حفظ التغييرات</button>
+        <button class="btn-logout" onclick="logout()">تسجيل الخروج</button>
+      </div>
+
+
+      <p class="small">يمكنك تعديل بياناتك هنا وسـتُحفظ دائماً.</p>
+    </div>
+  </div>
+
+
+<script>
+// عند تحميل الصفحة: إذا currentUser موجود نعرض الملف الشخصي
+window.addEventListener('DOMContentLoaded', ()=>{
+  const current = JSON.parse(localStorage.getItem('currentUser'));
+  if(current){
+    showProfile(current);
+  } else {
+    // عرض واجهة تسجيل الدخول
+    document.getElementById('loginView').style.display = 'block';
+    document.getElementById('profileView').style.display = 'none';
+  }
+});
+
+
+// دالة تسجيل الدخول
+function login(){
+  const email = (document.getElementById('inEmail').value || '').trim().toLowerCase();
+  const pass = document.getElementById('inPass').value || '';
+
+
+  if(!email || !pass){ alert('المرجوا ملء الحقول'); return; }
+
+
+  const users = JSON.parse(localStorage.getItem('users') || '[]');
+  const user = users.find(u => u.email === email && u.password === pass);
+
+
+  if(user){
+    // تسجيل الدخول وحفظ currentUser
+    localStorage.setItem('currentUser', JSON.stringify(user));
+    // إظهار صفحة الملف الشخصي
+    showProfile(user);
+    // تحويل للصفحة الرئيسية بعد ثانيتين (اختياري)
+    setTimeout(()=>{ window.location.href = 'index.html'; }, 700);
+  } else {
+    alert('البريد أو كلمة المرور غير صحيحة');
+  }
+}
+
+
+// إظهار الملف الشخصي وتعبئته
+function showProfile(user){
+  document.getElementById('loginView').style.display = 'none';
+  document.getElementById('profileView').style.display = 'block';
+  document.getElementById('pName').value = user.name || '';
+  document.getElementById('pLast').value = user.last || '';
+  document.getElementById('pEmail').value = user.email || '';
+  document.getElementById('pPass').value = user.password || '';
+  document.getElementById('profileView').setAttribute('aria-hidden','false');
+}
+
+
+// حفظ التغييرات في localStorage
+function saveProfile(){
+  const updated = {
+    name: document.getElementById('pName').value.trim(),
+    last: document.getElementById('pLast').value.trim(),
+    email: document.getElementById('pEmail').value.trim().toLowerCase(),
+    password: document.getElementById('pPass').value
+  };
+  if(!updated.name || !updated.email || !updated.password){ alert('املأ الحقول المطلوبة'); return; }
+
+
+  // تحديث قائمة المستخدمين
+  let users = JSON.parse(localStorage.getItem('users') || '[]');
+  const old = JSON.parse(localStorage.getItem('currentUser'));
+
+
+  users = users.map(u => (u.email === old.email) ? updated : u);
+  localStorage.setItem('users', JSON.stringify(users));
+  localStorage.setItem('currentUser', JSON.stringify(updated));
+  alert('تم حفظ التغييرات ✔');
+}
+
+
+// تسجيل الخروج
+function logout(){
+  localStorage.removeItem('currentUser');
+  // إظهار واجهة الدخول
+  document.getElementById('profileView').style.display = 'none';
+  document.getElementById('loginView').style.display = 'block';
+  document.getElementById('inEmail').value = '';
+  document.getElementById('inPass').value = '';
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>منتج — Tiny Kids</title>
+<style>
+:root {
+  --primary-color: #ff6f3c;
+  --secondary-color: #fff;
+  --bg-color: #fef7f2;
+  --text-color: #333;
+  --card-shadow: rgba(0,0,0,0.1);
+}
+
+
+/* أساسي */
+* { box-sizing: border-box; margin:0; padding:0; font-family:'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+body { background-color: var(--bg-color); color: var(--text-color); }
+
+
+/* شريط علوي */
+header { background-color: var(--secondary-color); padding:12px 20px; display:flex; justify-content:space-between; align-items:center; box-shadow:0 2px 8px var(--card-shadow); }
+header h1 { color: var(--primary-color); font-size:22px; font-weight:bold; }
+nav a img { width:40px; transition:0.3s; }
+nav a img:hover { transform:scale(1.1); }
+
+
+/* محتوى المنتج */
+.product-container { display:flex; flex-direction:column; align-items:center; padding:15px 10px; gap:20px; }
+.image-section { width:80%; max-width:250px; border-radius:15px; overflow:hidden; box-shadow:0 4px 12px var(--card-shadow); margin-bottom:15px; }
+.image-section img { width:100%; cursor:zoom-in; transition:0.3s; }
+.image-section img:hover { transform:scale(1.05); }
+
+
+.details-section {
+  width:90%; max-width:350px; background-color: var(--secondary-color);
+  border-radius:15px; padding:20px; box-shadow:0 4px 12px var(--card-shadow);
+  display:flex; flex-direction:column; gap:12px;
+}
+.details-section h2 { color: var(--primary-color); font-size:22px; margin-bottom:5px; }
+.details-section p.description { font-size:15px; color:#555; margin-bottom:5px; }
+.details-section p.price { font-size:20px; font-weight:bold; color: var(--primary-color); margin-bottom:10px; }
+.details-section label { font-weight:bold; margin-bottom:5px; }
+.details-section select, .details-section input[type="number"] {
+  width:100%; padding:10px 12px; margin-bottom:12px; border-radius:10px; border:1px solid #ccc; font-size:15px;
+}
+.details-section button {
+  width:100%; padding:14px; background-color: var(--primary-color); color: var(--secondary-color);
+  border:none; border-radius:10px; font-size:16px; font-weight:bold; cursor:pointer;
+  transition:0.3s;
+}
+.details-section button:hover { background-color:#e05c2b; transform:translateY(-2px); }
+
+
+#msg { text-align:center; font-weight:bold; margin-top:5px; }
+#msg.success { color:green; }
+#msg.error { color:red; }
+
+
+/* Responsive */
+@media(max-width:500px){
+  header { flex-direction:column; gap:8px; }
+  .image-section { width:70%; max-width:200px; }
+  .details-section { width:95%; padding:15px; }
+}
+</style>
+</head>
+<body>
+
+
+<header>
+  <h1>TINY KIDS</h1>
+  <nav>
+    <a href="index.html"><img src="home.png" alt="الرئيسية"></a>
+    <a href="cart.html"><img src="pngegg.png" alt="السلة"></a>
+  </nav>
+</header>
+
+
+<section class="product-container">
+  <div class="image-section">
+    <img id="productImage" src="" alt="منتج">
+  </div>
+
+
+  <div class="details-section">
+    <h2 id="productName"></h2>
+    <p class="description" id="productDescription"></p>
+    <p class="price" id="productPrice"></p>
+
+
+    <label for="productSize">المقاس</label>
+    <select id="productSize">
+      <option value="2 ans">2 ans</option>
+      <option value="4 ans">4 ans</option>
+      <option value="6 ans">6 ans</option>
+    </select>
+
+
+    <label for="productQuantity">الكمية</label>
+    <input type="number" id="productQuantity" value="1" min="1">
+
+
+    <div id="msg"></div>
+
+
+    <button id="addToCart">إضافة إلى السلة</button>
+  </div>
+</section>
+
+
+<script>
+// جلب بيانات المنتج من localStorage
+const product = JSON.parse(localStorage.getItem('selectedProduct'));
+
+
+if(product){
+  document.getElementById('productImage').src = product.img;
+  document.getElementById('productName').textContent = product.name;
+  document.getElementById('productDescription').textContent = product.description || 'وصف المنتج غير متوفر';
+  document.getElementById('productPrice').textContent = product.price + ' DA';
+}
+
+
+// إضافة إلى السلة والانتقال إلى checkout
+document.getElementById('addToCart').addEventListener('click', ()=>{
+  const order = {
+    product_name: product.name,
+    product_img: product.img,
+    product_price_unit: product.price,
+    product_size: document.getElementById('productSize').value,
+    quantity: parseInt(document.getElementById('productQuantity').value)
+  };
+
+
+  sessionStorage.setItem('currentOrder', JSON.stringify(order));
+  window.location.href = 'checkout.html';
+});
+</script>
+
+
+</body>
+</html>

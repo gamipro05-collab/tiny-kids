@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1.0" />
+<title>إنشاء حساب — Tiny Kids</title>
+<style>
+  /* تصميم متناسق مع login (Glassmorphism) */
+  body{font-family:'Cairo',sans-serif;direction:rtl;margin:0;min-height:100vh;
+    display:flex;align-items:center;justify-content:center;
+    background:linear-gradient(135deg,#ff9966,#ff5e62);background-size:200% 200%;animation:move 8s ease-in-out infinite;}
+  @keyframes move{0%{background-position:0% 50%}100%{background-position:100% 50%}}
+  .card{width:92%;max-width:440px;padding:28px;border-radius:16px;
+    background:rgba(255,255,255,0.18);backdrop-filter:blur(10px);
+    border:1px solid rgba(255,255,255,0.35);box-shadow:0 12px 40px rgba(0,0,0,0.22);color:#fff}
+  h1{margin:0 0 14px;font-size:24px;text-align:center}
+  label{display:block;text-align:right;font-weight:700;margin:8px 0 6px}
+  input{width:100%;padding:12px;border-radius:10px;border:none;font-size:15px;margin-bottom:6px;background:rgba(255,255,255,0.9);outline:none}
+  input:focus{box-shadow:0 6px 18px rgba(0,0,0,0.12)}
+  .row{display:flex;gap:10px}
+  .btn{width:100%;padding:12px;border-radius:12px;border:none;margin-top:10px;background:#111;color:#fff;font-weight:700;cursor:pointer}
+  .btn:hover{transform:scale(1.02)}
+  p{margin-top:12px;color:rgba(255,255,255,0.9);text-align:center}
+  a{color:#fff;text-decoration:underline}
+  .small{font-size:13px;opacity:0.95}
+</style>
+</head>
+<body>
+  <div class="card" role="main" aria-labelledby="regTitle">
+    <h1 id="regTitle">إنشاء حساب جديد</h1>
+
+
+    <label for="fname">الاسم</label>
+    <input id="fname" type="text" placeholder="الاسم الأول" autocomplete="given-name">
+
+
+    <label for="lname">اللقب</label>
+    <input id="lname" type="text" placeholder="اللقب" autocomplete="family-name">
+
+
+    <label for="email">البريد الإلكتروني</label>
+    <input id="email" type="email" placeholder="example@mail.com" autocomplete="email">
+
+
+    <label for="pass">كلمة المرور</label>
+    <input id="pass" type="password" placeholder="اختر كلمة قوية" autocomplete="new-password">
+
+
+    <button class="btn" onclick="register()">تسجيل وإنشاء حساب</button>
+
+
+    <p class="small">هل لديك حساب؟ <a href="login.html">سجّل الدخول</a></p>
+  </div>
+
+
+<script>
+function register(){
+  const name = document.getElementById('fname').value.trim();
+  const last = document.getElementById('lname').value.trim();
+  const email = document.getElementById('email').value.trim().toLowerCase();
+  const password = document.getElementById('pass').value;
+
+
+  if(!name || !last || !email || !password){
+    alert('المرجوا ملء جميع الحقول');
+    return;
+  }
+
+
+  // جلب المستخدمين الموجودين
+  const users = JSON.parse(localStorage.getItem('users') || '[]');
+
+
+  // التحقق من وجود الإيميل مسبقاً
+  if(users.some(u => u.email === email)){
+    alert('هذا البريد مستخدم مسبقاً!');
+    return;
+  }
+
+
+  // تكوين كائن المستخدم
+  const newUser = { name, last, email, password };
+
+
+  // حفظ
+  users.push(newUser);
+  localStorage.setItem('users', JSON.stringify(users));
+
+
+  // تسجيل الدخول تلقائياً بعد التسجيل
+  localStorage.setItem('currentUser', JSON.stringify(newUser));
+
+
+  // توجيه للصفحة الرئيسية حيث سيظهر كمستخدم مسجل
+  alert('تم إنشاء الحساب وتسجيل الدخول تلقائياً. أهلاً بك!');
+  window.location.href = 'index.html';
+}
+</script>
+</body>
+</html>

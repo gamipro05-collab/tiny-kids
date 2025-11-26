@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Checkout — Tiny Kids</title>
+<style>
+:root{
+  --primary:#ff6f3c; --card:#fff; --bg:#fef7f2; --text:#333;
+}
+*{box-sizing:border-box}
+body{font-family:Segoe UI, Tahoma, Verdana, sans-serif;background:var(--bg);color:var(--text);margin:0;padding:20px}
+.container{max-width:1000px;margin:0 auto}
+.card{background:var(--card);border-radius:12px;box-shadow:0 6px 20px rgba(0,0,0,.08);padding:18px;display:flex;gap:20px;flex-wrap:wrap}
+.left,.right{flex:1 1 360px}
+h1{color:var(--primary);margin:0 0 12px}
+.product-box{display:flex;gap:12px;align-items:center}
+.product-box img{width:120px;border-radius:10px}
+.muted{color:#666;font-size:14px}
+label{display:block;margin-top:10px;font-weight:700}
+input,select{width:100%;padding:10px;border-radius:8px;border:1px solid #dcdcdc;margin-top:6px;font-size:15px}
+.total-line{margin-top:8px;font-weight:800;color:var(--primary)}
+.btn{display:inline-block;width:100%;padding:12px;margin-top:14px;background:var(--primary);color:#fff;border:none;border-radius:10px;font-size:16px;cursor:pointer}
+.msg{margin-top:10px;font-weight:700;text-align:center}
+.msg.success{color:green}
+.msg.error{color:red}
+@media(max-width:800px){.card{flex-direction:column}}
+</style>
+</head>
+<body>
+<div class="container">
+  <div class="card">
+    <div class="left">
+      <h1>تفاصيل المنتج</h1>
+      <div class="product-box">
+        <img id="productImage" src="" alt="صورة المنتج">
+        <div>
+          <div style="font-weight:800" id="productName">—</div>
+          <div class="muted">السعر للوحدة: <span id="productPrice">0</span> DA</div>
+          <div class="muted">المقاس: <span id="productSize">—</span></div>
+          <div class="muted">الكمية: <span id="productQuantity">0</span></div>
+          <div class="total-line">إجمالي المنتج: <span id="productsTotal">0</span> DA</div>
+          <div class="total-line" style="margin-top:6px">تكلفة التوصيل: <span id="deliveryCost">0</span> DA</div>
+          <div class="total-line" style="margin-top:6px">المجموع الكلي: <span id="grandTotal">0</span> DA</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="right">
+      <h1>معلومات المشتري</h1>
+
+      <label for="name">الاسم</label>
+      <input id="name" type="text" placeholder="الاسم" required>
+
+      <label for="lastname">اللقب</label>
+      <input id="lastname" type="text" placeholder="اللقب" required>
+
+      <label for="phone">رقم الهاتف</label>
+      <input id="phone" type="tel" placeholder="مثال: 0550xxxxxx" required>
+
+      <label for="delivery">طريقة التوصيل</label>
+      <select id="delivery">
+        <option value="home">إلى المنزل</option>
+        <option value="office">استلام من المكتب</option>
+      </select>
+
+      <label for="state">الولاية</label>
+      <select id="state"></select>
+
+      <div id="cityContainer">
+        <label for="city">البلدية</label>
+        <input id="city" type="text" placeholder="اكتب اسم البلدية" required>
+      </div>
+
+      <label for="address">العنوان</label>
+      <input id="address" type="text" placeholder="شارع، رقم..." required>
+
+      <div id="msg" class="msg"></div>
+      <button id="submitOrder" class="btn" type="button">إرسال الطلب</button>
+    </div>
+  </div>
+</div>
+
+<script>
+const DELIVERY_PRICES = {
+  "أدرار":1500,"الشلف":700,"الأغواط":850,"أم البواقي":750,"باتنة":700,"بجاية":700,"بشار":1300,
+  "البليدة":550,"البويرة":650,"تمنراست":1500,"تبسة":800,"تلمسان":700,"تيارت":700,"تيزي وزو":600,"الجزائر":400,
+  "الجلفة":850,"جيجل":700,"سطيف":700,"سعيدة":850,"سكيكدة":700,"سيدي بلعباس":700,"عنابة":700,"قالمة":750,
+  "قسنطينة":700,"المدية":650,"مستغانم":700,"المسيلة":700,"معسكر":700,"ورقلة":900,"وهران":700,"البيض":900,
+  "برج بوعريريج":700,"بومرداس":550,"الطارف":750,"تيسمسيلت":700,"تيبازة":550,"ميلة":700,"تندوف":1500,"خنشلة":750,"سوق أهراس":750,
+  "غليزان":700,"غرداية":900,"النعامة":950,"عين الدفلى":700,"عين تموشنت":700,"تيميمون":1500,"برج باجي مختار":950,
+  "أولاد جلال":900,"بني عباس":1300,"عين صالح":1300,"تقرت":1300,"المغير":1300,"المنيعة":1300,"الوادي":900
+};
+
+const stateSelect = document.getElementById('state');
+const deliverySelect = document.getElementById('delivery');
+const cityContainer = document.getElementById('cityContainer');
+const cityInput = document.getElementById('city');
+const msg = document.getElementById('msg');
+const deliveryCostEl = document.getElementById('deliveryCost');
+const productsTotalEl = document.getElementById('productsTotal');
+const grandTotalEl = document.getElementById('grandTotal');
+
+const order = JSON.parse(sessionStorage.getItem('currentOrder') || '{}');
+const unitPrice = Number(order.product_price_unit || 0);
+const quantity = Number(order.quantity || 0);
+const productsTotal = unitPrice * quantity;
+
+document.getElementById('productImage').src = order.product_img || '';
+document.getElementById('productName').innerText = order.product_name || 'منتج';
+document.getElementById('productPrice').innerText = unitPrice || 0;
+document.getElementById('productSize').innerText = order.product_size || '-';
+document.getElementById('productQuantity').innerText = quantity || 0;
+productsTotalEl.innerText = productsTotal;
+
+let currentDeliveryPrice = 0;
+updateTotals();
+
+function fillStates(){
+  stateSelect.innerHTML = '';
+  if(deliverySelect.value === 'office'){
+    const opt = document.createElement('option');
+    opt.value = 'الجزائر';
+    opt.textContent = 'الجزائر — 250 دج';
+    stateSelect.appendChild(opt);
+    cityContainer.innerHTML = `
+      <label for="citySelect">البلدية</label>
+      <select id="citySelect">
+        <option value="الرغاية">الرغاية</option>
+        <option value="الحراش">الحراش</option>
+      </select>
+    `;
+  } else {
+    for(const wilaya in DELIVERY_PRICES){
+      const opt = document.createElement('option');
+      opt.value = wilaya;
+      opt.textContent = `${wilaya} — ${DELIVERY_PRICES[wilaya]} دج`;
+      stateSelect.appendChild(opt);
+    }
+    cityContainer.innerHTML = `
+      <label for="city">البلدية</label>
+      <input id="city" type="text" placeholder="اكتب اسم البلدية" required>
+    `;
+  }
+  const maybeCity = document.getElementById('city');
+  const maybeCitySelect = document.getElementById('citySelect');
+  if(maybeCity) { window.cityRef = maybeCity; } else if(maybeCitySelect){ window.cityRef = maybeCitySelect; } else { window.cityRef = null; }
+  computeDeliveryPriceAndUpdate();
+}
+
+function computeDeliveryPriceAndUpdate(){
+  const deliveryType = deliverySelect.value;
+  const stateValue = stateSelect.value;
+  let price = 0;
+  if(deliveryType === 'office'){
+    price = 250;
+  } else {
+    price = DELIVERY_PRICES[stateValue] !== undefined ? Number(DELIVERY_PRICES[stateValue]) : 0;
+  }
+  currentDeliveryPrice = price;
+  deliveryCostEl.innerText = currentDeliveryPrice;
+  updateTotals();
+}
+
+function updateTotals(){
+  const grand = productsTotal + (Number(currentDeliveryPrice) || 0);
+  grandTotalEl.innerText = grand;
+}
+
+deliverySelect.addEventListener('change', ()=>{ fillStates(); });
+stateSelect.addEventListener('change', computeDeliveryPriceAndUpdate);
+window.addEventListener('DOMContentLoaded', ()=>{ fillStates(); });
+
+document.getElementById('submitOrder').addEventListener('click', ()=>{
+  msg.className = 'msg'; msg.textContent = '';
+
+  const name = document.getElementById('name').value.trim();
+  const lastname = document.getElementById('lastname').value.trim();
+  const phone = document.getElementById('phone').value.trim();
+  const address = document.getElementById('address').value.trim();
+  const delivery = deliverySelect.value;
+  const state = stateSelect.value;
+  const cityVal = window.cityRef ? window.cityRef.value.trim() : '';
+
+  if(!name || !lastname || !phone){
+    msg.className = 'msg error'; msg.textContent = 'المرجوا تعبئة الاسم واللقب ورقم الهاتف';
+    return;
+  }
+  if(delivery === 'home' && (!state || !cityVal)){
+    msg.className = 'msg error'; msg.textContent = 'المرجوا اختيار الولاية وكتابة البلدية لتوصيل المنزل';
+    return;
+  }
+  if(delivery === 'office' && (!state || !cityVal)){
+    msg.className = 'msg error'; msg.textContent = 'المرجوا اختيار البلدية للاستلام من المكتب';
+    return;
+  }
+  if(!address){
+    msg.className = 'msg error'; msg.textContent = 'المرجوا كتابة العنوان أو مكان الاستلام';
+    return;
+  }
+
+  const deliveryPriceUsed = Number(currentDeliveryPrice || 0);
+  const orderData = {
+    product_name: order.product_name || '',
+    product_img: order.product_img || '',
+    product_price_unit: unitPrice,
+    quantity: quantity,
+    product_size: order.product_size || '-',   // ← أضفت هذا السطر
+    products_total: productsTotal,             // ← أضفت هذا السطر
+    delivery_type: delivery,
+    state: state,
+    city: cityVal,
+    address: address,
+    delivery_price: deliveryPriceUsed,
+    grand_total: productsTotal + deliveryPriceUsed,
+    customer: { name, lastname, phone },
+    created_at: new Date().toISOString()
+  };
+
+  const cart = JSON.parse(localStorage.getItem('cartItems') || '[]');
+  cart.push(orderData);
+  localStorage.setItem('cartItems', JSON.stringify(cart));
+
+  msg.className = 'msg success'; msg.textContent = 'تم استلام طلبك بنجاح. شكراً لك!';
+  setTimeout(()=>{ window.location.href = 'cart.html'; }, 1000);
+});
+</script>
+</body>
+</html>

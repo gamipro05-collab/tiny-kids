@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Cart — Tiny Kids</title>
+<style>
+:root {
+  --primary-color: #ff6f3c;
+  --secondary-color: #fff;
+  --bg-color: #fef7f2;
+  --text-color: #333;
+  --card-shadow: rgba(0,0,0,0.1);
+}
+* { box-sizing:border-box; margin:0; padding:0; font-family:'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+body { background-color: var(--bg-color); color: var(--text-color); line-height:1.6; }
+header { background-color: var(--secondary-color); padding:12px 20px; display:flex; justify-content:space-between; align-items:center; box-shadow:0 2px 8px var(--card-shadow);}
+header h1 { color: var(--primary-color); font-size:22px; font-weight:bold; }
+nav a img { width:40px; transition:0.3s; }
+nav a img:hover { transform:scale(1.1); }
+.wrap { max-width:1000px; margin:30px auto; padding:0 20px; }
+.cart-item { display:flex; gap:20px; align-items:center; background-color: var(--secondary-color); border-radius: 15px; padding:15px; margin-bottom:20px; box-shadow:0 3px 10px rgba(0,0,0,0.1);}
+.cart-item img { width:120px; border-radius:10px; }
+.cart-meta h2 { margin-bottom:5px; }
+.cart-meta .muted { font-size:14px; color:#555; margin-bottom:5px; }
+.cart-meta .total { font-weight:bold; color:var(--primary-color); }
+#totalSummary { text-align:right; font-size:20px; font-weight:bold; margin-top:20px; color: var(--primary-color); }
+.footer-info { background-color: #fff3e0; padding:15px; border-radius:12px; margin-top:30px; text-align:center; font-size:14px; }
+.agree-container { margin-top:15px; display:flex; align-items:center; gap:10px; }
+.agree-container input { width:18px; height:18px; }
+#confirmBtn { margin-top:15px; padding:12px 20px; font-size:16px; font-weight:bold; background-color:var(--primary-color); color:#fff; border:none; border-radius:12px; cursor:pointer; width:100%; }
+#confirmBtn:hover { background-color:#e05c2b; }
+#confirmBtn:disabled { background-color:#ccc; cursor:not-allowed; }
+#msg { text-align:center; font-weight:bold; margin-bottom:15px; color:green; }
+.removeBtn { margin-top:5px; padding:6px 12px; font-size:14px; border:none; border-radius:8px; cursor:pointer; background-color:#ff5555; color:#fff; }
+.removeBtn:hover { background-color:#e03c3c; }
+</style>
+</head>
+<body>
+<header>
+  <h1>TINY KIDS</h1>
+  <nav>
+    <a href="index.html"><img src="home.png" alt="الرئيسية"></a>
+    <a href="cart.html"><img src="pngegg.png" alt="السلة"></a>
+  </nav>
+</header>
+
+
+<div class="wrap" id="cartContainer"></div>
+
+
+<div class="wrap total-summary" id="totalSummary">
+  الإجمالي الكلي: 0 DA
+</div>
+
+
+<div class="wrap agree-container">
+  <input type="checkbox" id="agreeTerms">
+  <label for="agreeTerms">أوافق على شروط الاستخدام وسياسة الإرجاع</label>
+</div>
+
+
+<button class="wrap" id="confirmBtn" disabled>إرسال الطلب النهائي</button>
+<div id="msg"></div>
+
+
+<div class="wrap footer-info">
+  <p>الرجاء التأكد من صحة معلومات الطلب قبل الإرسال.</p>
+</div>
+
+
+<script>
+const cartContainer = document.getElementById('cartContainer');
+const totalSummary = document.getElementById('totalSummary');
+const confirmBtn = document.getElementById('confirmBtn');
+const msgDiv = document.getElementById('msg');
+const agreeTerms = document.getElementById('agreeTerms');
+const SF_API_KEY = 'sf_7640j964m7d6b69lhjdhkghk';
+
+
+let cartItems = JSON.parse(localStorage.getItem('cartItems') || '[]');
+
+
+agreeTerms.addEventListener('change', () => {
+  confirmBtn.disabled = !agreeTerms.checked;
+});
+
+
+function calculateTotal() {
+  const total = cartItems.reduce((sum, item) =>
+    sum + (Number(item.grand_total) || Number(item.products_total) || item.product_price_unit * item.quantity), 0);
+  totalSummary.textContent = `الإجمالي الكلي: ${total} DA`;
+}
+
+
+function renderCart() {
+  cartContainer.innerHTML = '';
+  if(cartItems.length === 0){
+    cartContainer.innerHTML = '<p>السلة فارغة</p>';
+    totalSummary.textContent = 'الإجمالي الكلي: 0 DA';
+    return;
+  }
+
+
+  cartItems.forEach((item, index) => {
+    const div = document.createElement('div');
+    div.classList.add('cart-item');
+    div.innerHTML = `
+      <img src="${item.product_img}" alt="${item.product_name}">
+      <div class="cart-meta">
+        <h2>${item.product_name}</h2>
+        <p class="muted">المقاس: ${item.product_size}</p>
+        <p class="muted">الكمية: ${item.quantity}</p>
+        <p class="muted">سعر الوحدة: ${item.product_price_unit} DA</p>
+        <p class="muted">إجمالي المنتج: ${item.products_total} DA</p>
+        <p class="total">المجموع الكلي: ${item.grand_total} DA</p>
+        <button class="removeBtn" data-index="${index}">إزالة</button>
+      </div>
+    `;
+    cartContainer.appendChild(div);
+  });
+
+
+  document.querySelectorAll('.removeBtn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const i = btn.getAttribute('data-index');
+      cartItems.splice(i, 1);
+      localStorage.setItem('cartItems', JSON.stringify(cartItems));
+      renderCart();
+    });
+  });
+
+
+  calculateTotal();
+}
+
+
+async function getUserIP() {
+    try {
+        let res = await fetch("https://api.ipify.org?format=json");
+        let data = await res.json();
+        return data.ip;
+    } catch {
+        return "0.0.0.0";
+    }
+}
+
+
+async function canUserSubmit() {
+    const MAX = 5;
+    const ip = await getUserIP();
+    const today = new Date().toISOString().split("T")[0];
+    let db = JSON.parse(localStorage.getItem("submit_limit") || "{}");
+    if (!db[ip] || db[ip].date !== today) {
+        db[ip] = { date: today, count: 0 };
+    }
+    if (db[ip].count >= MAX) {
+        return false;
+    }
+    db[ip].count++;
+    localStorage.setItem("submit_limit", JSON.stringify(db));
+    return true;
+}
+
+
+async function sendOrder() {
+  if(cartItems.length === 0) return;
+
+
+  const today = new Date().toISOString().slice(0,10);
+  const submissions = JSON.parse(localStorage.getItem('sf_submissions') || '{}');
+  if(submissions[today] >= 5){
+    alert('لقد وصلت الحد الأقصى للطلبات اليوم.');
+    return;
+  }
+
+
+  for(const item of cartItems){
+    const payload = {
+      apiKey: SF_API_KEY,
+      name: item.customer?.name,
+      lastname: item.customer?.lastname,
+      phone: item.customer?.phone,
+      address: item.address,
+      city: item.city,
+      state: item.state,
+
+
+      /*** ✔✔ التعديل هنا فقط: إرسال نوع التوصيل الحقيقي ***/
+      delivery_type: item.delivery_type,
+
+
+      product_name: item.product_name,
+      product_size: item.product_size,
+      quantity: item.quantity,
+      product_price_unit: item.product_price_unit,
+      products_total: item.products_total,
+      grand_total: item.grand_total,
+      product_img: item.product_img
+    };
+
+
+    try {
+      await fetch('https://api.staticforms.xyz/submit', {
+        method: 'POST',
+        headers: { 'Content-Type':'application/json' },
+        body: JSON.stringify(payload)
+      });
+    } catch(e){}
+  }
+
+
+  submissions[today] = (submissions[today] || 0) + cartItems.length;
+  localStorage.setItem('sf_submissions', JSON.stringify(submissions));
+
+
+  cartItems = [];
+  localStorage.setItem('cartItems', JSON.stringify(cartItems));
+  renderCart();
+
+
+  msgDiv.textContent = 'تم استلام طلبك يرجى الانتظار لتأكيده';
+  setTimeout(()=>{ window.location.href = 'index.html'; }, 2000);
+}
+
+
+confirmBtn.addEventListener('click', sendOrder);
+
+
+renderCart();
+</script>
+</body>
+</html>
